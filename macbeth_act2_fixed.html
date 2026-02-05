@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macbeth Act II - Interactive Reading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #2d0a0a;
+            padding: 1.5rem;
+            border-bottom: 3px solid #8b0000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .audio-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            background: #1a1a1a;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 0.5rem;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2d0a0a;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #8b0000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #8b0000;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .audio-controls button {
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .audio-controls button:hover:not(:disabled) {
+            background: #b30000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.4);
+        }
+
+        .audio-controls button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .audio-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .speed-control label {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .speed-control select {
+            background: #2d0a0a;
+            color: #e0e0e0;
+            border: 2px solid #8b0000;
+            padding: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            background: #2d0a0a;
+            padding: 0.5rem;
+            border-bottom: 2px solid #8b0000;
+        }
+
+        .tab-button {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            border: 2px solid #8b0000;
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            background: #2d0a0a;
+            color: #ff6b6b;
+        }
+
+        .tab-button.active {
+            background: #8b0000;
+            color: white;
+            border-bottom: 2px solid #8b0000;
+        }
+
+        .main-content {
+            display: flex;
+            height: calc(100vh - 220px);
+        }
+
+        .pdf-container {
+            flex: 1;
+            background: #2a2a2a;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pdf-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #2d0a0a;
+            border-left: 3px solid #8b0000;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .sidebar h2 {
+            color: #ff6b6b;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            text-align: center;
+            border-bottom: 2px solid #8b0000;
+            padding-bottom: 0.5rem;
+        }
+
+        .scene-marker {
+            background: #8b0000;
+            color: white;
+            padding: 0.7rem;
+            margin: 1.5rem 0 1rem 0;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .moment-item {
+            background: #1a1a1a;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid #8b0000;
+        }
+
+        .moment-item:hover {
+            background: #2a2a2a;
+            transform: translateX(5px);
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .moment-item.active {
+            background: #8b0000;
+            color: white;
+            border-left: 4px solid #ff6b6b;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+        }
+
+        .moment-location {
+            font-size: 0.85rem;
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .moment-item.active .moment-location {
+            color: #fff;
+        }
+
+        .moment-description {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #8b0000;
+            border-radius: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #b30000;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 300px;
+                border-left: none;
+                border-top: 3px solid #8b0000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>The Tragedy of Macbeth - Act II</h1>
+        <div class="audio-controls">
+            <div class="controls-row">
+                <button id="playPauseBtn">▶ Play</button>
+                <button id="skipBackBtn">⏪ -10s</button>
+                <button id="skipForwardBtn">⏩ +10s</button>
+                <div class="speed-control">
+                    <label for="speedSelect">Speed:</label>
+                    <select id="speedSelect">
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                    </select>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-container">
+        <button class="tab-button active" data-tab="original">Original Text</button>
+        <button class="tab-button" data-tab="nofear">No Fear Shakespeare</button>
+    </div>
+
+    <div class="main-content">
+        <div class="pdf-container">
+            <iframe id="pdfFrame" src="17_Macbeth_Act_II_Complete.pdf"></iframe>
+        </div>
+        <div class="sidebar">
+            <h2>Key Moments</h2>
+            <div id="momentsList"></div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="auto">
+        <source src="Macbeth_2.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Key Moments Data
+        const moments = [
+            {
+                scene: "Scene i - Inverness. Court of Macbeth's castle",
+                items: [
+                    {
+                        time: 0,
+                        originalPage: 281,
+                        noFearPage: 19,
+                        lines: "1-9",
+                        description: "Banquo and Fleance discuss the late hour; Banquo troubled by dark thoughts"
+                    },
+                    {
+                        time: 45,
+                        originalPage: 282,
+                        noFearPage: 19,
+                        lines: "10-30",
+                        description: "Macbeth and Banquo meet; Duncan pleased with hospitality; Banquo mentions witches"
+                    },
+                    {
+                        time: 112,
+                        originalPage: 282,
+                        noFearPage: 19,
+                        lines: "31-64",
+                        description: "Macbeth's 'dagger of the mind' soliloquy - hallucinating murder weapon"
+                    }
+                ]
+            },
+            {
+                scene: "Scene ii - Macbeth's castle",
+                items: [
+                    {
+                        time: 245,
+                        originalPage: 283,
+                        noFearPage: 19,
+                        lines: "1-13",
+                        description: "Lady Macbeth alone, emboldened by wine; has drugged the guards"
+                    },
+                    {
+                        time: 285,
+                        originalPage: 284,
+                        noFearPage: 20,
+                        lines: "14-26",
+                        description: "Macbeth returns: 'I have done the deed' - quick, nervous exchanges"
+                    },
+                    {
+                        time: 325,
+                        originalPage: 284,
+                        noFearPage: 20,
+                        lines: "27-40",
+                        description: "Macbeth unable to say 'Amen'; heard voice cry 'Sleep no more!'"
+                    },
+                    {
+                        time: 410,
+                        originalPage: 285,
+                        noFearPage: 20,
+                        lines: "41-57",
+                        description: "Lady Macbeth orders him to return daggers; Macbeth refuses"
+                    },
+                    {
+                        time: 470,
+                        originalPage: 285,
+                        noFearPage: 21,
+                        lines: "58-72",
+                        description: "Macbeth's guilt: 'Will all great Neptune's ocean wash this blood...'; knocking begins"
+                    }
+                ]
+            },
+            {
+                scene: "Scene iii - Macbeth's castle",
+                items: [
+                    {
+                        time: 535,
+                        originalPage: 286,
+                        noFearPage: 21,
+                        lines: "1-21",
+                        description: "Porter's drunken comedy - imagining he's gatekeeper of hell"
+                    },
+                    {
+                        time: 640,
+                        originalPage: 287,
+                        noFearPage: 22,
+                        lines: "22-44",
+                        description: "Porter admits Macduff and Lennox; jokes about drink and lechery"
+                    },
+                    {
+                        time: 720,
+                        originalPage: 287,
+                        noFearPage: 23,
+                        lines: "45-63",
+                        description: "Macbeth greets them; Lennox describes unnatural night of storms"
+                    },
+                    {
+                        time: 790,
+                        originalPage: 288,
+                        noFearPage: 23,
+                        lines: "64-77",
+                        description: "Macduff discovers Duncan's murder: 'O horror, horror, horror!'"
+                    },
+                    {
+                        time: 840,
+                        originalPage: 289,
+                        noFearPage: 24,
+                        lines: "78-93",
+                        description: "Chaos as household wakes; Macbeth explains killing the guards"
+                    },
+                    {
+                        time: 950,
+                        originalPage: 289,
+                        noFearPage: 25,
+                        lines: "94-117",
+                        description: "Lady Macbeth faints; Macbeth's elaborate justification"
+                    },
+                    {
+                        time: 1050,
+                        originalPage: 290,
+                        noFearPage: 26,
+                        lines: "118-147",
+                        description: "Malcolm and Donalbain plan to flee - 'There's daggers in men's smiles'"
+                    }
+                ]
+            },
+            {
+                scene: "Scene iv - Outside Macbeth's castle",
+                items: [
+                    {
+                        time: 1140,
+                        originalPage: 291,
+                        noFearPage: 27,
+                        lines: "1-20",
+                        description: "Ross and Old Man discuss unnatural events: dark day, owl kills falcon"
+                    },
+                    {
+                        time: 1220,
+                        originalPage: 291,
+                        noFearPage: 28,
+                        lines: "21-42",
+                        description: "Macduff reports princes fled, suspicion falls on them; Macbeth to be crowned"
+                    }
+                ]
+            }
+        ];
+
+        // Audio and UI Elements
+        const audio = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const skipBackBtn = document.getElementById('skipBackBtn');
+        const skipForwardBtn = document.getElementById('skipForwardBtn');
+        const speedSelect = document.getElementById('speedSelect');
+        const pdfFrame = document.getElementById('pdfFrame');
+        const momentsList = document.getElementById('momentsList');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationDisplay = document.getElementById('duration');
+
+        let currentTab = 'original';
+        let currentMomentIndex = -1;
+
+        // Format time helper
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = `${percent}%`;
+            currentTimeDisplay.textContent = formatTime(audio.currentTime);
+        }
+
+        // Progress bar click
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        });
+
+        // Audio loaded
+        audio.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(audio.duration);
+        });
+
+        // Audio error handling
+        audio.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+            console.error('Audio error code:', audio.error ? audio.error.code : 'unknown');
+            console.error('Audio src:', audio.src);
+            playPauseBtn.textContent = '⚠ Audio File Not Found';
+            playPauseBtn.disabled = true;
+        });
+
+        // Audio canplay event
+        audio.addEventListener('canplay', () => {
+            console.log('Audio can play - file loaded successfully');
+        });
+
+        // Audio loadstart
+        audio.addEventListener('loadstart', () => {
+            console.log('Audio load started');
+        });
+
+        // Render Key Moments
+        function renderMoments() {
+            momentsList.innerHTML = '';
+            moments.forEach((scene, sceneIdx) => {
+                const sceneMarker = document.createElement('div');
+                sceneMarker.className = 'scene-marker';
+                sceneMarker.textContent = scene.scene;
+                momentsList.appendChild(sceneMarker);
+
+                scene.items.forEach((moment, idx) => {
+                    const momentItem = document.createElement('div');
+                    momentItem.className = 'moment-item';
+                    momentItem.dataset.time = moment.time;
+                    
+                    const location = document.createElement('div');
+                    location.className = 'moment-location';
+                    if (currentTab === 'nofear') {
+                        location.textContent = `No Fear: Page ${moment.noFearPage} | Original: Page ${moment.originalPage} | Lines ${moment.lines}`;
+                    } else {
+                        location.textContent = `Page ${moment.originalPage} | Lines ${moment.lines}`;
+                    }
+                    
+                    const description = document.createElement('div');
+                    description.className = 'moment-description';
+                    description.textContent = moment.description;
+                    
+                    momentItem.appendChild(location);
+                    momentItem.appendChild(description);
+                    momentItem.addEventListener('click', () => {
+                        audio.currentTime = moment.time;
+                        if (audio.paused) {
+                            const playPromise = audio.play();
+                            if (playPromise !== undefined) {
+                                playPromise.then(() => {
+                                    playPauseBtn.textContent = '⏸ Pause';
+                                }).catch(error => {
+                                    console.error('Play error:', error);
+                                });
+                            }
+                        }
+                    });
+                    
+                    momentsList.appendChild(momentItem);
+                });
+            });
+        }
+
+        // Update active moment
+        function updateActiveMoment() {
+            const currentTime = audio.currentTime;
+            const allMoments = [];
+            moments.forEach(scene => {
+                scene.items.forEach(item => allMoments.push(item));
+            });
+
+            let activeIdx = -1;
+            for (let i = allMoments.length - 1; i >= 0; i--) {
+                if (currentTime >= allMoments[i].time) {
+                    activeIdx = i;
+                    break;
+                }
+            }
+
+            if (activeIdx !== currentMomentIndex) {
+                currentMomentIndex = activeIdx;
+                const momentItems = document.querySelectorAll('.moment-item');
+                momentItems.forEach((item, idx) => {
+                    item.classList.toggle('active', idx === activeIdx);
+                });
+
+                if (activeIdx >= 0) {
+                    const activeMoment = allMoments[activeIdx];
+                    const pageNum = currentTab === 'nofear' ? activeMoment.noFearPage : activeMoment.originalPage;
+                    pdfFrame.src = pdfFrame.src.split('#')[0] + `#page=${pageNum}`;
+                    
+                    // Scroll to active moment
+                    const activeElement = momentItems[activeIdx];
+                    if (activeElement) {
+                        activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+        }
+
+        // Audio Controls
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        playPauseBtn.textContent = '⏸ Pause';
+                    }).catch(error => {
+                        console.error('Play error:', error);
+                        alert('Audio playback failed. Check console for details.\n\nMake sure:\n1. Audio file "Macbeth_2.mp3" is in the same folder\n2. Filename matches exactly (case-sensitive)\n3. File is not corrupted');
+                    });
+                }
+            } else {
+                audio.pause();
+                playPauseBtn.textContent = '▶ Play';
+            }
+        });
+
+        skipBackBtn.addEventListener('click', () => {
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
+        });
+
+        skipForwardBtn.addEventListener('click', () => {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+        });
+
+        speedSelect.addEventListener('change', (e) => {
+            audio.playbackRate = parseFloat(e.target.value);
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            updateProgress();
+            updateActiveMoment();
+        });
+
+        audio.addEventListener('ended', () => {
+            playPauseBtn.textContent = '▶ Play';
+        });
+
+        // Tab Switching
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentTab = button.dataset.tab;
+                
+                if (currentTab === 'nofear') {
+                    pdfFrame.src = 'Macbeth_NoFear_Act_2.pdf';
+                } else {
+                    pdfFrame.src = '17_Macbeth_Act_II_Complete.pdf';
+                }
+                
+                renderMoments();
+                updateActiveMoment();
+            });
+        });
+
+        // Initialize
+        renderMoments();
+    </script>
+</body>
+</html>
