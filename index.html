@@ -37,13 +37,53 @@
 
         .audio-controls {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            flex-wrap: wrap;
             background: #1a1a1a;
             padding: 1rem;
             border-radius: 8px;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 0.5rem;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2d0a0a;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #8b0000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #8b0000;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.1s linear;
         }
 
         .audio-controls button {
@@ -58,14 +98,19 @@
             font-weight: 600;
         }
 
-        .audio-controls button:hover {
+        .audio-controls button:hover:not(:disabled) {
             background: #b30000;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(139, 0, 0, 0.4);
         }
 
-        .audio-controls button:active {
+        .audio-controls button:active:not(:disabled) {
             transform: translateY(0);
+        }
+
+        .audio-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .speed-control {
@@ -123,7 +168,7 @@
 
         .main-content {
             display: flex;
-            height: calc(100vh - 200px);
+            height: calc(100vh - 220px);
         }
 
         .pdf-container {
@@ -131,20 +176,6 @@
             background: #2a2a2a;
             overflow: hidden;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pdf-placeholder {
-            text-align: center;
-            color: #666;
-            padding: 2rem;
-        }
-
-        .pdf-placeholder h3 {
-            color: #ff6b6b;
-            margin-bottom: 1rem;
         }
 
         .pdf-container iframe {
@@ -255,17 +286,28 @@
     <div class="header">
         <h1>The Tragedy of Macbeth - Act II</h1>
         <div class="audio-controls">
-            <button id="playPauseBtn">▶ Play</button>
-            <button id="skipBackBtn">⏪ -10s</button>
-            <button id="skipForwardBtn">⏩ +10s</button>
-            <div class="speed-control">
-                <label for="speedSelect">Speed:</label>
-                <select id="speedSelect">
-                    <option value="0.75">0.75x</option>
-                    <option value="1" selected>1x</option>
-                    <option value="1.25">1.25x</option>
-                    <option value="1.5">1.5x</option>
-                </select>
+            <div class="controls-row">
+                <button id="playPauseBtn">▶ Play</button>
+                <button id="skipBackBtn">⏪ -10s</button>
+                <button id="skipForwardBtn">⏩ +10s</button>
+                <div class="speed-control">
+                    <label for="speedSelect">Speed:</label>
+                    <select id="speedSelect">
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                    </select>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -277,12 +319,7 @@
 
     <div class="main-content">
         <div class="pdf-container">
-            <div class="pdf-placeholder">
-                <h3>PDF Viewer</h3>
-                <p>Place your PDF files in the same folder as this HTML file:</p>
-                <p><strong>17_Macbeth_Act_II_Complete.pdf</strong></p>
-                <p><strong>Macbeth_NoFear_Act_2.pdf</strong></p>
-            </div>
+            <iframe id="pdfFrame" src="17_Macbeth_Act_II_Complete.pdf"></iframe>
         </div>
         <div class="sidebar">
             <h2>Key Moments</h2>
@@ -444,11 +481,50 @@
         const skipBackBtn = document.getElementById('skipBackBtn');
         const skipForwardBtn = document.getElementById('skipForwardBtn');
         const speedSelect = document.getElementById('speedSelect');
+        const pdfFrame = document.getElementById('pdfFrame');
         const momentsList = document.getElementById('momentsList');
         const tabButtons = document.querySelectorAll('.tab-button');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationDisplay = document.getElementById('duration');
 
         let currentTab = 'original';
         let currentMomentIndex = -1;
+
+        // Format time helper
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = `${percent}%`;
+            currentTimeDisplay.textContent = formatTime(audio.currentTime);
+        }
+
+        // Progress bar click
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        });
+
+        // Audio loaded
+        audio.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(audio.duration);
+        });
+
+        // Audio error handling
+        audio.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+            playPauseBtn.textContent = '⚠ Audio File Not Found';
+            playPauseBtn.disabled = true;
+        });
 
         // Render Key Moments
         function renderMoments() {
@@ -515,6 +591,10 @@
                 });
 
                 if (activeIdx >= 0) {
+                    const activeMoment = allMoments[activeIdx];
+                    const pageNum = currentTab === 'nofear' ? activeMoment.noFearPage : activeMoment.originalPage;
+                    pdfFrame.src = pdfFrame.src.split('#')[0] + `#page=${pageNum}`;
+                    
                     // Scroll to active moment
                     const activeElement = momentItems[activeIdx];
                     if (activeElement) {
@@ -547,7 +627,10 @@
             audio.playbackRate = parseFloat(e.target.value);
         });
 
-        audio.addEventListener('timeupdate', updateActiveMoment);
+        audio.addEventListener('timeupdate', () => {
+            updateProgress();
+            updateActiveMoment();
+        });
 
         audio.addEventListener('ended', () => {
             playPauseBtn.textContent = '▶ Play';
@@ -559,6 +642,13 @@
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 currentTab = button.dataset.tab;
+                
+                if (currentTab === 'nofear') {
+                    pdfFrame.src = 'Macbeth_NoFear_Act_2.pdf';
+                } else {
+                    pdfFrame.src = '17_Macbeth_Act_II_Complete.pdf';
+                }
+                
                 renderMoments();
                 updateActiveMoment();
             });
