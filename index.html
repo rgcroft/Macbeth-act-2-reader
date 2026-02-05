@@ -131,6 +131,20 @@
             background: #2a2a2a;
             overflow: hidden;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pdf-placeholder {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+
+        .pdf-placeholder h3 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
         }
 
         .pdf-container iframe {
@@ -263,7 +277,12 @@
 
     <div class="main-content">
         <div class="pdf-container">
-            <iframe id="pdfFrame" src="17_Macbeth_Act_II_Complete.pdf"></iframe>
+            <div class="pdf-placeholder">
+                <h3>PDF Viewer</h3>
+                <p>Place your PDF files in the same folder as this HTML file:</p>
+                <p><strong>17_Macbeth_Act_II_Complete.pdf</strong></p>
+                <p><strong>Macbeth_NoFear_Act_2.pdf</strong></p>
+            </div>
         </div>
         <div class="sidebar">
             <h2>Key Moments</h2>
@@ -425,7 +444,6 @@
         const skipBackBtn = document.getElementById('skipBackBtn');
         const skipForwardBtn = document.getElementById('skipForwardBtn');
         const speedSelect = document.getElementById('speedSelect');
-        const pdfFrame = document.getElementById('pdfFrame');
         const momentsList = document.getElementById('momentsList');
         const tabButtons = document.querySelectorAll('.tab-button');
 
@@ -497,10 +515,6 @@
                 });
 
                 if (activeIdx >= 0) {
-                    const activeMoment = allMoments[activeIdx];
-                    const pageNum = currentTab === 'nofear' ? activeMoment.noFearPage : activeMoment.originalPage;
-                    pdfFrame.src = pdfFrame.src.split('#')[0] + `#page=${pageNum}`;
-                    
                     // Scroll to active moment
                     const activeElement = momentItems[activeIdx];
                     if (activeElement) {
@@ -545,13 +559,6 @@
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 currentTab = button.dataset.tab;
-                
-                if (currentTab === 'nofear') {
-                    pdfFrame.src = 'Macbeth_NoFear_Act_2.pdf';
-                } else {
-                    pdfFrame.src = '17_Macbeth_Act_II_Complete.pdf';
-                }
-                
                 renderMoments();
                 updateActiveMoment();
             });
