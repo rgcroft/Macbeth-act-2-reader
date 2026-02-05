@@ -522,8 +522,20 @@
         // Audio error handling
         audio.addEventListener('error', (e) => {
             console.error('Audio error:', e);
+            console.error('Audio error code:', audio.error ? audio.error.code : 'unknown');
+            console.error('Audio src:', audio.src);
             playPauseBtn.textContent = '⚠ Audio File Not Found';
             playPauseBtn.disabled = true;
+        });
+
+        // Audio canplay event
+        audio.addEventListener('canplay', () => {
+            console.log('Audio can play - file loaded successfully');
+        });
+
+        // Audio loadstart
+        audio.addEventListener('loadstart', () => {
+            console.log('Audio load started');
         });
 
         // Render Key Moments
@@ -557,8 +569,14 @@
                     momentItem.addEventListener('click', () => {
                         audio.currentTime = moment.time;
                         if (audio.paused) {
-                            audio.play();
-                            playPauseBtn.textContent = '⏸ Pause';
+                            const playPromise = audio.play();
+                            if (playPromise !== undefined) {
+                                playPromise.then(() => {
+                                    playPauseBtn.textContent = '⏸ Pause';
+                                }).catch(error => {
+                                    console.error('Play error:', error);
+                                });
+                            }
                         }
                     });
                     
@@ -607,8 +625,15 @@
         // Audio Controls
         playPauseBtn.addEventListener('click', () => {
             if (audio.paused) {
-                audio.play();
-                playPauseBtn.textContent = '⏸ Pause';
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        playPauseBtn.textContent = '⏸ Pause';
+                    }).catch(error => {
+                        console.error('Play error:', error);
+                        alert('Audio playback failed. Check console for details.\n\nMake sure:\n1. Audio file "Macbeth_2.mp3" is in the same folder\n2. Filename matches exactly (case-sensitive)\n3. File is not corrupted');
+                    });
+                }
             } else {
                 audio.pause();
                 playPauseBtn.textContent = '▶ Play';
