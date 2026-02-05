@@ -1,580 +1,564 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macbeth Act II - Interactive Reading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #2d0a0a;
+            padding: 1.5rem;
+            border-bottom: 3px solid #8b0000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: #1a1a1a;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .audio-controls button {
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .audio-controls button:hover {
+            background: #b30000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.4);
+        }
+
+        .audio-controls button:active {
+            transform: translateY(0);
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .speed-control label {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .speed-control select {
+            background: #2d0a0a;
+            color: #e0e0e0;
+            border: 2px solid #8b0000;
+            padding: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            background: #2d0a0a;
+            padding: 0.5rem;
+            border-bottom: 2px solid #8b0000;
+        }
+
+        .tab-button {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            border: 2px solid #8b0000;
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            background: #2d0a0a;
+            color: #ff6b6b;
+        }
+
+        .tab-button.active {
+            background: #8b0000;
+            color: white;
+            border-bottom: 2px solid #8b0000;
+        }
+
+        .main-content {
+            display: flex;
+            height: calc(100vh - 200px);
+        }
+
+        .pdf-container {
+            flex: 1;
+            background: #2a2a2a;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pdf-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #2d0a0a;
+            border-left: 3px solid #8b0000;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .sidebar h2 {
+            color: #ff6b6b;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            text-align: center;
+            border-bottom: 2px solid #8b0000;
+            padding-bottom: 0.5rem;
+        }
+
+        .scene-marker {
+            background: #8b0000;
+            color: white;
+            padding: 0.7rem;
+            margin: 1.5rem 0 1rem 0;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .moment-item {
+            background: #1a1a1a;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid #8b0000;
+        }
+
+        .moment-item:hover {
+            background: #2a2a2a;
+            transform: translateX(5px);
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .moment-item.active {
+            background: #8b0000;
+            color: white;
+            border-left: 4px solid #ff6b6b;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+        }
+
+        .moment-location {
+            font-size: 0.85rem;
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .moment-item.active .moment-location {
+            color: #fff;
+        }
+
+        .moment-description {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #8b0000;
+            border-radius: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #b30000;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 300px;
+                border-left: none;
+                border-top: 3px solid #8b0000;
+            }
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Macbeth Act II - Interactive Reading&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>* {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #e0e0e0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-x: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #2d0a0a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 1.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 3px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: sticky;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 100;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header h1 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b6b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.8rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.audio-controls {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.audio-controls button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0.7rem 1.2rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.9rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.audio-controls button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #b30000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 8px rgba(139, 0, 0, 0.4);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.audio-controls button:active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(0);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.speed-control {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.speed-control label {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b6b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.speed-control select {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #2d0a0a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #e0e0e0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.9rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tab-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #2d0a0a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 2px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tab-button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #e0e0e0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0.8rem 2rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px 5px 0 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tab-button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #2d0a0a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b6b;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tab-button.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 2px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.main-content {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: calc(100vh - 200px);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pdf-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #2a2a2a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pdf-container iframe {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sidebar {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 350px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #2d0a0a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-left: 3px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-y: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 1.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sidebar h2 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b6b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 1.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.4rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 2px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-bottom: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.scene-marker {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0.7rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 1.5rem 0 1rem 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.moment-item {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 0.8rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-left: 4px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.moment-item:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #2a2a2a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateX(5px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-left: 4px solid #ff6b6b;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.moment-item.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-left: 4px solid #ff6b6b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 15px rgba(139, 0, 0, 0.6);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.moment-location {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b6b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 0.4rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.moment-item.active .moment-location {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.moment-description {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.95rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1.4;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sidebar::-webkit-scrollbar {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sidebar::-webkit-scrollbar-track {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sidebar::-webkit-scrollbar-thumb {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sidebar::-webkit-scrollbar-thumb:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #b30000;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 768px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.main-content {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sidebar {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>height: 300px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>border-left: none;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>border-top: 3px solid #8b0000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;The Tragedy of Macbeth - Act II&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="audio-controls"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="playPauseBtn"&gt;▶ Play&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="skipBackBtn"&gt;⏪ -10s&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="skipForwardBtn"&gt;⏩ +10s&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="speed-control"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;label for="speedSelect"&gt;Speed:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;select id="speedSelect"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;option value="0.75"&gt;0.75x&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;option value="1" selected&gt;1x&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;option value="1.25"&gt;1.25x&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;option value="1.5"&gt;1.5x&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="tab-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="tab-button active" data-tab="original"&gt;Original Text&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="tab-button" data-tab="nofear"&gt;No Fear Shakespeare&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="main-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pdf-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;iframe id="pdfFrame" src="17_Macbeth_Act_II_Complete.pdf"&gt;&lt;/iframe&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="sidebar"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Key Moments&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="momentsList"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;audio id="audioPlayer" preload="auto"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;source src="Macbeth_2.mp3" type="audio/mpeg"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/audio&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Key Moments Data</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const moments = [</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                </span>scene: "Scene i - Inverness. Court of Macbeth's castle",</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 0,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 281,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 19,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "1-9",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Banquo and Fleance discuss the late hour; Banquo troubled by dark thoughts"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 45,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 282,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 19,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "10-30",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macbeth and Banquo meet; Duncan pleased with hospitality; Banquo mentions witches"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 112,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 282,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 19,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "31-64",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macbeth's 'dagger of the mind' soliloquy - hallucinating murder weapon"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>]</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                </span>scene: "Scene ii - Macbeth's castle",</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 245,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 283,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 19,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "1-13",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Lady Macbeth alone, emboldened by wine; has drugged the guards"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 285,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 284,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 20,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "14-26",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macbeth returns: 'I have done the deed' - quick, nervous exchanges"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 325,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 284,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 20,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "27-40",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macbeth unable to say 'Amen'; heard voice cry 'Sleep no more!'"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 410,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 285,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 20,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "41-57",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Lady Macbeth orders him to return daggers; Macbeth refuses"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 470,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 285,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 21,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "58-72",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macbeth's guilt: 'Will all great Neptune's ocean wash this blood...'; knocking begins"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>]</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                </span>scene: "Scene iii - Macbeth's castle",</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 535,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 286,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 21,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "1-21",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Porter's drunken comedy - imagining he's gatekeeper of hell"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 640,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 287,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 22,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "22-44",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Porter admits Macduff and Lennox; jokes about drink and lechery"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 720,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 287,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 23,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "45-63",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macbeth greets them; Lennox describes unnatural night of storms"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 790,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 288,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 23,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "64-77",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macduff discovers Duncan's murder: 'O horror, horror, horror!'"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 840,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 289,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 24,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "78-93",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Chaos as household wakes; Macbeth explains killing the guards"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 950,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 289,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 25,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "94-117",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Lady Macbeth faints; Macbeth's elaborate justification"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 1050,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 290,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 26,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "118-147",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Malcolm and Donalbain plan to flee - 'There's daggers in men's smiles'"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>]</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                </span>scene: "Scene iv - Outside Macbeth's castle",</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 1140,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 291,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 27,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "1-20",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Ross and Old Man discuss unnatural events: dark day, owl kills falcon"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>time: 1220,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>originalPage: 291,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>noFearPage: 28,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>lines: "21-42",</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: "Macduff reports princes fled, suspicion falls on them; Macbeth to be crowned"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>]</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Audio and UI Elements</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const audio = document.getElementById('audioPlayer');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const playPauseBtn = document.getElementById('playPauseBtn');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const skipBackBtn = document.getElementById('skipBackBtn');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const skipForwardBtn = document.getElementById('skipForwardBtn');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const speedSelect = document.getElementById('speedSelect');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const pdfFrame = document.getElementById('pdfFrame');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const momentsList = document.getElementById('momentsList');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const tabButtons = document.querySelectorAll('.tab-button');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>let currentTab = 'original';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let currentMomentIndex = -1;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Render Key Moments</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderMoments() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>momentsList.innerHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>moments.forEach((scene, sceneIdx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const sceneMarker = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>sceneMarker.className = 'scene-marker';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>sceneMarker.textContent = scene.scene;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>momentsList.appendChild(sceneMarker);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>scene.items.forEach((moment, idx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const momentItem = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>momentItem.className = 'moment-item';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>momentItem.dataset.time = moment.time;</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const location = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>location.className = 'moment-location';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (currentTab === 'nofear') {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>location.textContent = `No Fear: Page ${moment.noFearPage} | Original: Page ${moment.originalPage} | Lines ${moment.lines}`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>location.textContent = `Page ${moment.originalPage} | Lines ${moment.lines}`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const description = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>description.className = 'moment-description';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>description.textContent = moment.description;</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>momentItem.appendChild(location);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>momentItem.appendChild(description);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>momentItem.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>audio.currentTime = moment.time;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (audio.paused) {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>audio.play();</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>playPauseBtn.textContent = '⏸ Pause';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>momentsList.appendChild(momentItem);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Update active moment</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateActiveMoment() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const currentTime = audio.currentTime;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const allMoments = [];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>moments.forEach(scene =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>scene.items.forEach(item =&gt; allMoments.push(item));</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let activeIdx = -1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (let i = allMoments.length - 1; i &gt;= 0; i--) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (currentTime &gt;= allMoments[i].time) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>activeIdx = i;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (activeIdx !== currentMomentIndex) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>currentMomentIndex = activeIdx;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const momentItems = document.querySelectorAll('.moment-item');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>momentItems.forEach((item, idx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>item.classList.toggle('active', idx === activeIdx);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (activeIdx &gt;= 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const activeMoment = allMoments[activeIdx];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const pageNum = currentTab === 'nofear' ? activeMoment.noFearPage : activeMoment.originalPage;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>pdfFrame.src = pdfFrame.src.split('#')[0] + `#page=${pageNum}`;</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// Scroll to active moment</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const activeElement = momentItems[activeIdx];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (activeElement) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Audio Controls</p>
-<p class="p1"><span class="Apple-converted-space">        </span>playPauseBtn.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (audio.paused) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>audio.play();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>playPauseBtn.textContent = '⏸ Pause';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>audio.pause();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>playPauseBtn.textContent = '▶ Play';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>skipBackBtn.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>audio.currentTime = Math.max(0, audio.currentTime - 10);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>skipForwardBtn.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>speedSelect.addEventListener('change', (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>audio.playbackRate = parseFloat(e.target.value);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>audio.addEventListener('timeupdate', updateActiveMoment);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>audio.addEventListener('ended', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>playPauseBtn.textContent = '▶ Play';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Tab Switching</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tabButtons.forEach(button =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>button.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>tabButtons.forEach(btn =&gt; btn.classList.remove('active'));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>button.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>currentTab = button.dataset.tab;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (currentTab === 'nofear') {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>pdfFrame.src = 'Macbeth_NoFear_Act_2.pdf';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>pdfFrame.src = '17_Macbeth_Act_II_Complete.pdf';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderMoments();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateActiveMoment();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Initialize</p>
-<p class="p1"><span class="Apple-converted-space">        </span>renderMoments();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div class="header">
+        <h1>The Tragedy of Macbeth - Act II</h1>
+        <div class="audio-controls">
+            <button id="playPauseBtn">▶ Play</button>
+            <button id="skipBackBtn">⏪ -10s</button>
+            <button id="skipForwardBtn">⏩ +10s</button>
+            <div class="speed-control">
+                <label for="speedSelect">Speed:</label>
+                <select id="speedSelect">
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-container">
+        <button class="tab-button active" data-tab="original">Original Text</button>
+        <button class="tab-button" data-tab="nofear">No Fear Shakespeare</button>
+    </div>
+
+    <div class="main-content">
+        <div class="pdf-container">
+            <iframe id="pdfFrame" src="17_Macbeth_Act_II_Complete.pdf"></iframe>
+        </div>
+        <div class="sidebar">
+            <h2>Key Moments</h2>
+            <div id="momentsList"></div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="auto">
+        <source src="Macbeth_2.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Key Moments Data
+        const moments = [
+            {
+                scene: "Scene i - Inverness. Court of Macbeth's castle",
+                items: [
+                    {
+                        time: 0,
+                        originalPage: 281,
+                        noFearPage: 19,
+                        lines: "1-9",
+                        description: "Banquo and Fleance discuss the late hour; Banquo troubled by dark thoughts"
+                    },
+                    {
+                        time: 45,
+                        originalPage: 282,
+                        noFearPage: 19,
+                        lines: "10-30",
+                        description: "Macbeth and Banquo meet; Duncan pleased with hospitality; Banquo mentions witches"
+                    },
+                    {
+                        time: 112,
+                        originalPage: 282,
+                        noFearPage: 19,
+                        lines: "31-64",
+                        description: "Macbeth's 'dagger of the mind' soliloquy - hallucinating murder weapon"
+                    }
+                ]
+            },
+            {
+                scene: "Scene ii - Macbeth's castle",
+                items: [
+                    {
+                        time: 245,
+                        originalPage: 283,
+                        noFearPage: 19,
+                        lines: "1-13",
+                        description: "Lady Macbeth alone, emboldened by wine; has drugged the guards"
+                    },
+                    {
+                        time: 285,
+                        originalPage: 284,
+                        noFearPage: 20,
+                        lines: "14-26",
+                        description: "Macbeth returns: 'I have done the deed' - quick, nervous exchanges"
+                    },
+                    {
+                        time: 325,
+                        originalPage: 284,
+                        noFearPage: 20,
+                        lines: "27-40",
+                        description: "Macbeth unable to say 'Amen'; heard voice cry 'Sleep no more!'"
+                    },
+                    {
+                        time: 410,
+                        originalPage: 285,
+                        noFearPage: 20,
+                        lines: "41-57",
+                        description: "Lady Macbeth orders him to return daggers; Macbeth refuses"
+                    },
+                    {
+                        time: 470,
+                        originalPage: 285,
+                        noFearPage: 21,
+                        lines: "58-72",
+                        description: "Macbeth's guilt: 'Will all great Neptune's ocean wash this blood...'; knocking begins"
+                    }
+                ]
+            },
+            {
+                scene: "Scene iii - Macbeth's castle",
+                items: [
+                    {
+                        time: 535,
+                        originalPage: 286,
+                        noFearPage: 21,
+                        lines: "1-21",
+                        description: "Porter's drunken comedy - imagining he's gatekeeper of hell"
+                    },
+                    {
+                        time: 640,
+                        originalPage: 287,
+                        noFearPage: 22,
+                        lines: "22-44",
+                        description: "Porter admits Macduff and Lennox; jokes about drink and lechery"
+                    },
+                    {
+                        time: 720,
+                        originalPage: 287,
+                        noFearPage: 23,
+                        lines: "45-63",
+                        description: "Macbeth greets them; Lennox describes unnatural night of storms"
+                    },
+                    {
+                        time: 790,
+                        originalPage: 288,
+                        noFearPage: 23,
+                        lines: "64-77",
+                        description: "Macduff discovers Duncan's murder: 'O horror, horror, horror!'"
+                    },
+                    {
+                        time: 840,
+                        originalPage: 289,
+                        noFearPage: 24,
+                        lines: "78-93",
+                        description: "Chaos as household wakes; Macbeth explains killing the guards"
+                    },
+                    {
+                        time: 950,
+                        originalPage: 289,
+                        noFearPage: 25,
+                        lines: "94-117",
+                        description: "Lady Macbeth faints; Macbeth's elaborate justification"
+                    },
+                    {
+                        time: 1050,
+                        originalPage: 290,
+                        noFearPage: 26,
+                        lines: "118-147",
+                        description: "Malcolm and Donalbain plan to flee - 'There's daggers in men's smiles'"
+                    }
+                ]
+            },
+            {
+                scene: "Scene iv - Outside Macbeth's castle",
+                items: [
+                    {
+                        time: 1140,
+                        originalPage: 291,
+                        noFearPage: 27,
+                        lines: "1-20",
+                        description: "Ross and Old Man discuss unnatural events: dark day, owl kills falcon"
+                    },
+                    {
+                        time: 1220,
+                        originalPage: 291,
+                        noFearPage: 28,
+                        lines: "21-42",
+                        description: "Macduff reports princes fled, suspicion falls on them; Macbeth to be crowned"
+                    }
+                ]
+            }
+        ];
+
+        // Audio and UI Elements
+        const audio = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const skipBackBtn = document.getElementById('skipBackBtn');
+        const skipForwardBtn = document.getElementById('skipForwardBtn');
+        const speedSelect = document.getElementById('speedSelect');
+        const pdfFrame = document.getElementById('pdfFrame');
+        const momentsList = document.getElementById('momentsList');
+        const tabButtons = document.querySelectorAll('.tab-button');
+
+        let currentTab = 'original';
+        let currentMomentIndex = -1;
+
+        // Render Key Moments
+        function renderMoments() {
+            momentsList.innerHTML = '';
+            moments.forEach((scene, sceneIdx) => {
+                const sceneMarker = document.createElement('div');
+                sceneMarker.className = 'scene-marker';
+                sceneMarker.textContent = scene.scene;
+                momentsList.appendChild(sceneMarker);
+
+                scene.items.forEach((moment, idx) => {
+                    const momentItem = document.createElement('div');
+                    momentItem.className = 'moment-item';
+                    momentItem.dataset.time = moment.time;
+                    
+                    const location = document.createElement('div');
+                    location.className = 'moment-location';
+                    if (currentTab === 'nofear') {
+                        location.textContent = `No Fear: Page ${moment.noFearPage} | Original: Page ${moment.originalPage} | Lines ${moment.lines}`;
+                    } else {
+                        location.textContent = `Page ${moment.originalPage} | Lines ${moment.lines}`;
+                    }
+                    
+                    const description = document.createElement('div');
+                    description.className = 'moment-description';
+                    description.textContent = moment.description;
+                    
+                    momentItem.appendChild(location);
+                    momentItem.appendChild(description);
+                    momentItem.addEventListener('click', () => {
+                        audio.currentTime = moment.time;
+                        if (audio.paused) {
+                            audio.play();
+                            playPauseBtn.textContent = '⏸ Pause';
+                        }
+                    });
+                    
+                    momentsList.appendChild(momentItem);
+                });
+            });
+        }
+
+        // Update active moment
+        function updateActiveMoment() {
+            const currentTime = audio.currentTime;
+            const allMoments = [];
+            moments.forEach(scene => {
+                scene.items.forEach(item => allMoments.push(item));
+            });
+
+            let activeIdx = -1;
+            for (let i = allMoments.length - 1; i >= 0; i--) {
+                if (currentTime >= allMoments[i].time) {
+                    activeIdx = i;
+                    break;
+                }
+            }
+
+            if (activeIdx !== currentMomentIndex) {
+                currentMomentIndex = activeIdx;
+                const momentItems = document.querySelectorAll('.moment-item');
+                momentItems.forEach((item, idx) => {
+                    item.classList.toggle('active', idx === activeIdx);
+                });
+
+                if (activeIdx >= 0) {
+                    const activeMoment = allMoments[activeIdx];
+                    const pageNum = currentTab === 'nofear' ? activeMoment.noFearPage : activeMoment.originalPage;
+                    pdfFrame.src = pdfFrame.src.split('#')[0] + `#page=${pageNum}`;
+                    
+                    // Scroll to active moment
+                    const activeElement = momentItems[activeIdx];
+                    if (activeElement) {
+                        activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+        }
+
+        // Audio Controls
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.textContent = '⏸ Pause';
+            } else {
+                audio.pause();
+                playPauseBtn.textContent = '▶ Play';
+            }
+        });
+
+        skipBackBtn.addEventListener('click', () => {
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
+        });
+
+        skipForwardBtn.addEventListener('click', () => {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+        });
+
+        speedSelect.addEventListener('change', (e) => {
+            audio.playbackRate = parseFloat(e.target.value);
+        });
+
+        audio.addEventListener('timeupdate', updateActiveMoment);
+
+        audio.addEventListener('ended', () => {
+            playPauseBtn.textContent = '▶ Play';
+        });
+
+        // Tab Switching
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentTab = button.dataset.tab;
+                
+                if (currentTab === 'nofear') {
+                    pdfFrame.src = 'Macbeth_NoFear_Act_2.pdf';
+                } else {
+                    pdfFrame.src = '17_Macbeth_Act_II_Complete.pdf';
+                }
+                
+                renderMoments();
+                updateActiveMoment();
+            });
+        });
+
+        // Initialize
+        renderMoments();
+    </script>
 </body>
 </html>
